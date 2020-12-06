@@ -3,8 +3,9 @@
 
 
 import ast
-from tokenize import generate_tokens, NEWLINE, INDENT, NL
 from io import StringIO
+import sys
+from tokenize import generate_tokens, NEWLINE, INDENT, NL
 
 
 def getline(frame):
@@ -15,7 +16,13 @@ def getline(frame):
     filename = frame.f_code.co_filename
 
     with open(filename, "r") as f:
-        linesio = StringIO("".join(f.readlines()[lineno - 1:]))
+        lines = f.readlines()
+        if sys.version_info.minor <= 7:
+            # For python 3.6 and 3.7, f_lineno does not return correct position
+            # when it's multiline code
+            while "(" not in lines[lineno - 1]:
+                lineno -= 1
+        linesio = StringIO("".join(lines[lineno - 1:]))
         lst = []
         code_string = ""
         for toknum, tokval, _, _, _ in generate_tokens(linesio.readline):
