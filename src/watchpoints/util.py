@@ -4,8 +4,9 @@
 
 import ast
 from io import StringIO
+import re
 import sys
-from tokenize import generate_tokens, NEWLINE, INDENT, NL
+from tokenize import generate_tokens, NEWLINE, COMMENT, INDENT, NL
 
 
 def getline(frame):
@@ -29,7 +30,7 @@ def getline(frame):
             if toknum == NEWLINE:
                 code_string = " ".join(lst)
                 break
-            elif toknum != INDENT and toknum != NL:
+            elif toknum not in (COMMENT, NL, INDENT):
                 lst.append(tokval)
 
     return code_string
@@ -40,8 +41,12 @@ def getargnodes(frame):
     get the list of arguments of the current line function
     """
     line = getline(frame)
+    m = re.match(r".*?\((.*)\)", line)
+    if not m:
+        raise Exception(f"Unable to locate watch line {line}")
+    args = ["".join(s.strip().split()) for s in m.group(1).split(",")]
     try:
         tree = ast.parse(line)
-        return tree.body[0].value.args
+        return zip(tree.body[0].value.args, args[:len(tree.body[0].value.args)])
     except Exception:
-        raise Exception("Unable to parse the line {}".format(line))
+        raise Exception(f"Unable to parse the line {line}")

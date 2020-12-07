@@ -4,7 +4,7 @@
 
 import unittest
 import inspect
-from watchpoints.util import getline
+from watchpoints.util import getline, getargnodes
 
 
 class TestUtil(unittest.TestCase):
@@ -22,3 +22,28 @@ class TestUtil(unittest.TestCase):
                         b
                     )
         self.assertEqual(line, "line = watch ( a , b )")
+
+    def test_getargnodes(self):
+        def watch(*args):
+            frame = inspect.currentframe().f_back
+            return list(getargnodes(frame))
+
+        a = [0, 1]
+        b = {}
+        argnodes = watch(a)
+        self.assertEqual(len(argnodes), 1)
+        self.assertEqual(argnodes[0][1], "a")
+        argnodes = watch(
+                            a,
+                            b
+                        )
+        self.assertEqual(len(argnodes), 2)
+        self.assertEqual(argnodes[0][1], "a")
+        self.assertEqual(argnodes[1][1], "b")
+        argnodes = watch(
+                            a[0],  # comments
+                            b
+                        )
+        self.assertEqual(len(argnodes), 2)
+        self.assertEqual(argnodes[0][1], "a[0]")
+        self.assertEqual(argnodes[1][1], "b")

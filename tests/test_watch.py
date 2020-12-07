@@ -34,3 +34,25 @@ class TestWatch(unittest.TestCase):
 
         self.assertEqual(cb.counter, 6)
         unwatch()
+
+    def test_subscr(self):
+        cb = CB()
+        watch.config(callback=cb)
+        a = [1, 2, 3]
+        watch(a[1])
+        a[0] = 2
+        a[1] = 3
+        self.assertEqual(cb.counter, 1)
+
+        def val(arg):
+            return 1
+
+        a[val(3)] = 4
+        self.assertEqual(cb.counter, 2)
+        unwatch()
+
+        a = {"a": 1}
+        watch(a["a"])
+        a["a"] = 2
+        a["b"] = 3
+        self.assertEqual(cb.counter, 3)

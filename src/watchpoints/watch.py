@@ -19,8 +19,8 @@ class Watch:
     def __call__(self, *args, **kwargs):
         frame = inspect.currentframe().f_back
         argnodes = getargnodes(frame)
-        for node in argnodes:
-            self.watch_list.append(WatchElement(frame, node, alias=kwargs.get("alias", None)))
+        for node, name in argnodes:
+            self.watch_list.append(WatchElement(frame, node, alias=kwargs.get("alias", None), default_alias=name))
 
         if not self.enable and self.watch_list:
             self.start_trace(frame)

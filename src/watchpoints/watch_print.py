@@ -11,6 +11,10 @@ class WatchPrint:
 
     def __call__(self, frame, elem, exec_info):
         self.p(self._file_string(exec_info))
+        if elem.alias:
+            self.p(f"{elem.alias}:")
+        elif elem.default_alias:
+            self.p(f"{elem.default_alias}:")
         self.p(elem.prev_obj)
         self.p("->")
         self.p(elem.obj)
