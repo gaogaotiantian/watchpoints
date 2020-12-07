@@ -7,4 +7,11 @@ from .watch import Watch
 __version__ = "0.0.1"
 
 
+all = [
+    "watch",
+    "unwatch"
+]
+
+
 watch = Watch()
+unwatch = watch.unwatch

@@ -3,7 +3,6 @@
 
 
 import ast
-import copy
 
 
 def to_store(node):
@@ -11,29 +10,34 @@ def to_store(node):
     return node
 
 
-def ast_transform(node):
+def ast_parse_node(node):
     """
     :param ast.Node node: an ast node representing an expression of variable
 
-    :return ast.Node: an ast node for ```var = transform(var)```
+    :return ast.Node: an ast node for ```_obj = var```
     """
     root = ast.Module(
         body=[
             ast.Assign(
                 targets=[
-                    to_store(copy.deepcopy(node))
+                    ast.Name(id="_watchpoints_obj", ctx=ast.Store())
                 ],
-                value=ast.Call(
-                    func=ast.Name(id="_watch_transform", ctx=ast.Load()),
-                    args=[
-                        node
-                    ],
-                    keywords=[]
-                )
+                value=node
             )
         ],
         type_ignores=[]
     )
+
+    if type(node) is ast.Name:
+        root.body.append(
+            ast.Assign(
+                targets=[
+                    ast.Name(id="_watchpoints_localvar", ctx=ast.Store())
+                ],
+                value=ast.Constant(value=node.id)
+            )
+        )
+
     ast.fix_missing_locations(root)
 
     return root
