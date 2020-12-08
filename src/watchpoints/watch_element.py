@@ -32,28 +32,26 @@ class WatchElement:
         """
         :return (changed, exist):
         """
-        if frame is self.frame and self.localvar:
+        if frame is self.frame and self.localvar is not None:
             if self.localvar in frame.f_locals:
                 if frame.f_locals[self.localvar] != self.obj:
-                    self.prev_obj = self.obj
                     self.obj = frame.f_locals[self.localvar]
                     return True, True
             else:
                 return True, False
 
-        if self.parent and self.subscr:
+        if self.parent is not None and self.subscr is not None:
             try:
                 if self.parent[self.subscr] != self.obj:
-                    self.prev_obj = self.obj
                     self.obj = self.parent[self.subscr]
                     return True, True
             except (IndexError, KeyError):
                 return True, False
-        elif self.parent and self.attr:
+        elif self.parent is not None and self.attr is not None:
             try:
                 if getattr(self.parent, self.attr) != self.obj:
-                    self.prev_obj = self.obj
                     self.obj = getattr(self.parent, self.attr)
+                    return True, True
             except AttributeError:
                 return True, False
 

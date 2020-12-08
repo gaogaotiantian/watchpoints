@@ -44,12 +44,14 @@ class TestWatchElement(unittest.TestCase):
         wea = lst[0]
         web = lst[1]
         wec = lst[2]
+        c.a = 0
+        self.assertFalse(wec.changed(frame)[0])
         a.append(1)
         b[0] = 3
         c.a = 5
-        self.assertTrue(wea.changed(frame))
-        self.assertTrue(web.changed(frame))
-        self.assertTrue(wec.changed(frame))
+        self.assertTrue(wea.changed(frame)[0])
+        self.assertTrue(web.changed(frame)[0])
+        self.assertTrue(wec.changed(frame)[0])
 
     def test_same(self):
         a = []
