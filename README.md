@@ -59,7 +59,7 @@ a:
 {}
 ```
 
-Even better, it can track then changes of the object after the changes of the variable
+Even better, it can track the changes of the object after the changes of the variable
 
 ```python
 from watchpoints import watch
@@ -135,7 +135,7 @@ d["a"]:
 1
 ```
 
-watchpoints will try to guess what you want to monitor, and monitor it as you expect(well most of the time)
+**watchpoints will try to guess what you want to monitor, and monitor it as you expect**(well most of the time)
 
 ### unwatch
 
@@ -157,7 +157,7 @@ Or you can unwatch everything by passing no argument to it
 unwatch()  # unwatch everything
 ```
 
-monitoring variables will introduce a significant overhead, and should be used for debugging only.
+**monitoring variables will introduce a significant overhead, and should be used for debugging only.**
 
 ### alias
 
@@ -170,18 +170,9 @@ watch(a, alias="james")
 unwatch("james")
 ```
 
-### customize print
-
-By default, watchpoints uses ```pprint``` for data printing, and print for strings. You can use your own printer function to print in any format you like
-
-```python
-watch(a, printer=my_print)
-```
-
-
 ### customize callback
 
-Of course sometimes you want to print in your own format, or even something more than print. You can use your own callback for monitored variables
+Of course sometimes you want to print in your own format, or even do something more than print. You can use your own callback for monitored variables
 
 ```python
 watch(a, callback=my_callback)
@@ -193,9 +184,9 @@ The callback function takes three arguments
 def my_callback(frame, elem, exec_info)
 ```
 
-```frame``` is the current frame when a change is detected.
-```elem``` is a ```WatchElement``` object that I'm to lazy to describe for now.
-```exec_info``` is a tuple of ```(funcname, filename, lineno)``` of the line that changed the variable
+* ```frame``` is the current frame when a change is detected.
+* ```elem``` is a ```WatchElement``` object that I'm to lazy to describe for now.
+* ```exec_info``` is a tuple of ```(funcname, filename, lineno)``` of the line that changed the variable
 
 You can also set change the callback function globally by
 
