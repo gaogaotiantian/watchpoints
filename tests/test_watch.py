@@ -58,6 +58,7 @@ class TestWatch(unittest.TestCase):
         a["a"] = 2
         a["b"] = 3
         self.assertEqual(cb.counter, 3)
+        unwatch()
 
     def test_attr(self):
         class MyObj:
