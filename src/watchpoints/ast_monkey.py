@@ -74,6 +74,23 @@ def ast_parse_node(node):
                 value=value_node
             )
         )
+    elif type(node) is ast.Attribute:
+        root.body.append(
+            ast.Assign(
+                targets=[
+                    ast.Name(id="_watchpoints_parent", ctx=ast.Store())
+                ],
+                value=node.value
+            )
+        )
+        root.body.append(
+            ast.Assign(
+                targets=[
+                    ast.Name(id="_watchpoints_attr", ctx=ast.Store())
+                ],
+                value=ast.Constant(value=node.attr)
+            )
+        )
 
     ast.fix_missing_locations(root)
 

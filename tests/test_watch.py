@@ -2,6 +2,8 @@
 # For details: https://github.com/gaogaotiantian/watchpoints/blob/master/NOTICE.txt
 
 
+from contextlib import redirect_stdout
+import io
 import unittest
 from watchpoints import watch, unwatch
 
@@ -56,3 +58,28 @@ class TestWatch(unittest.TestCase):
         a["a"] = 2
         a["b"] = 3
         self.assertEqual(cb.counter, 3)
+
+    def test_attr(self):
+        class MyObj:
+            def __init__(self):
+                self.a = 0
+
+        cb = CB()
+        watch.config(callback=cb)
+        obj = MyObj()
+        watch(obj.a)
+        obj.a = 1
+        self.assertEqual(cb.counter, 1)
+        unwatch(obj.a)
+        obj.a = 2
+        self.assertEqual(cb.counter, 1)
+
+    def test_printer(self):
+        watch.restore()
+        s = io.StringIO()
+        with redirect_stdout(s):
+            a = [1, 2, 3]
+            watch(a, printer=print)
+            a[0] = 2
+            unwatch()
+            self.assertNotEqual(s.getvalue(), "")

@@ -20,7 +20,16 @@ class Watch:
         frame = inspect.currentframe().f_back
         argnodes = getargnodes(frame)
         for node, name in argnodes:
-            self.watch_list.append(WatchElement(frame, node, alias=kwargs.get("alias", None), default_alias=name))
+            self.watch_list.append(
+                WatchElement(
+                    frame,
+                    node,
+                    alias=kwargs.get("alias", None),
+                    default_alias=name,
+                    printer=kwargs.get("printer", None),
+                    callback=kwargs.get("callback", None)
+                )
+            )
 
         if not self.enable and self.watch_list:
             self.start_trace(frame)
@@ -60,11 +69,25 @@ class Watch:
         if "callback" in kwargs:
             self._callback = kwargs["callback"]
 
+    def restore(self):
+        self._callback = self._default_callback
+
     def tracefunc(self, frame, event, arg):
+        dirty = False
         for elem in self.watch_list:
-            if elem.changed(frame):
-                self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+            changed, exist = elem.changed(frame)
+            if changed:
+                if elem.callback:
+                    elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+                else:
+                    self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
                 elem.update()
+            if not exist:
+                dirty = True
+
+        if dirty:
+            self.watch_list = [elem for elem in self.watch_list if elem.exist]
+
         self._prev_funcname = frame.f_code.co_name
         self._prev_filename = frame.f_code.co_filename
         self._prev_lineno = frame.f_lineno
