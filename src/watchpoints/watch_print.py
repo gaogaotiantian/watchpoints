@@ -11,10 +11,7 @@ class WatchPrint:
         self.file = file
 
     def __call__(self, frame, elem, exec_info):
-        if elem.printer:
-            p = elem.printer
-        else:
-            p = self.printer
+        p = self.printer
         p(self._file_string(exec_info))
         if elem.alias:
             p(f"{elem.alias}:")

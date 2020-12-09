@@ -7,7 +7,7 @@ import copy
 
 
 class WatchElement:
-    def __init__(self, frame, node, alias=None, default_alias=None, printer=None, callback=None):
+    def __init__(self, frame, node, alias=None, default_alias=None, callback=None):
         code = compile(ast_parse_node(node), "<string>", "exec")
         f_locals = frame.f_locals
         exec(code, {}, f_locals)
@@ -24,7 +24,6 @@ class WatchElement:
         self.update()
         self.alias = alias
         self.default_alias = default_alias
-        self.printer = printer
         self._callback = callback
         self.exist = True
 

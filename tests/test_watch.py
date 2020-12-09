@@ -4,6 +4,7 @@
 
 from contextlib import redirect_stdout
 import io
+import sys
 import unittest
 from watchpoints import watch, unwatch
 
@@ -98,8 +99,9 @@ class TestWatch(unittest.TestCase):
         watch.restore()
         s = io.StringIO()
         with redirect_stdout(s):
+            watch.config(file=sys.stdout)
             a = [1, 2, 3]
-            watch(a, printer=print)
+            watch(a)
             a[0] = 2
             unwatch()
             self.assertNotEqual(s.getvalue(), "")

@@ -16,9 +16,7 @@ class Watch:
         self.watch_list = []
         self.tracefunc_stack = []
         self.enable = False
-        self._callback = self._default_callback
-        self.pdb = None
-        self.pdb_enable = False
+        self.restore()
 
     def __call__(self, *args, **kwargs):
         frame = inspect.currentframe().f_back
@@ -30,7 +28,6 @@ class Watch:
                     node,
                     alias=kwargs.get("alias", None),
                     default_alias=name,
-                    printer=kwargs.get("printer", None),
                     callback=kwargs.get("callback", None)
                 )
             )
@@ -84,8 +81,14 @@ class Watch:
             self.pdb = pdb.Pdb()
             self.pdb.reset()
 
+        if "file" in kwargs:
+            self.file = kwargs["file"]
+
     def restore(self):
         self._callback = self._default_callback
+        self.pdb = None
+        self.file = sys.stderr
+        self.pdb_enable = False
 
     def tracefunc(self, frame, event, arg):
         dirty = False
@@ -121,5 +124,5 @@ class Watch:
         return self.tracefunc
 
     def _default_callback(self, frame, elem, exec_info):
-        wp = WatchPrint()
+        wp = WatchPrint(self.file)
         wp(frame, elem, exec_info)

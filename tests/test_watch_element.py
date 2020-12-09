@@ -17,7 +17,6 @@ class TestWatchElement(unittest.TestCase):
                     node,
                     alias=kwargs.get("alias", None),
                     default_alias=name,
-                    printer=kwargs.get("printer", None),
                     callback=kwargs.get("callback", None)
                 ) for node, name in argnodes]
 
