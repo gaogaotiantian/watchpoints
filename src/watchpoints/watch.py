@@ -2,7 +2,9 @@
 # For details: https://github.com/gaogaotiantian/watchpoints/blob/master/NOTICE.txt
 
 
+from bdb import BdbQuit
 import inspect
+import pdb
 import sys
 from .util import getargnodes
 from .watch_element import WatchElement
@@ -15,6 +17,8 @@ class Watch:
         self.tracefunc_stack = []
         self.enable = False
         self._callback = self._default_callback
+        self.pdb = None
+        self.pdb_enable = False
 
     def __call__(self, *args, **kwargs):
         frame = inspect.currentframe().f_back
@@ -40,18 +44,25 @@ class Watch:
         if not self.enable:
             self.enable = True
             self.tracefunc_stack.append(sys.gettrace())
-            sys.settrace(self.tracefunc)
-            frame.f_trace = self.tracefunc
             self._prev_funcname = frame.f_code.co_name
             self._prev_filename = frame.f_code.co_filename
             self._prev_lineno = frame.f_lineno
+            while frame:
+                frame.f_trace = self.tracefunc
+                frame = frame.f_back
+
+            sys.settrace(self.tracefunc)
 
     def stop_trace(self, frame):
         if self.enable:
-            tf = self.tracefunc_stack.pop()
-            sys.settrace(tf)
-            frame.f_trace = tf
             self.enable = False
+            tf = self.tracefunc_stack.pop()
+            frame.f_trace = tf
+            while frame:
+                frame.f_trace = tf
+                frame = frame.f_back
+
+            sys.settrace(tf)
 
     def unwatch(self, *args):
         frame = inspect.currentframe().f_back
@@ -69,6 +80,10 @@ class Watch:
         if "callback" in kwargs:
             self._callback = kwargs["callback"]
 
+        if "pdb" in kwargs:
+            self.pdb = pdb.Pdb()
+            self.pdb.reset()
+
     def restore(self):
         self._callback = self._default_callback
 
@@ -77,6 +92,8 @@ class Watch:
         for elem in self.watch_list:
             changed, exist = elem.changed(frame)
             if changed:
+                if self.pdb:
+                    self.pdb_enable = True
                 if elem._callback:
                     elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
                 else:
@@ -91,6 +108,15 @@ class Watch:
         self._prev_funcname = frame.f_code.co_name
         self._prev_filename = frame.f_code.co_filename
         self._prev_lineno = frame.f_lineno
+
+        if self.pdb_enable:
+            try:
+                self.pdb.trace_dispatch(frame, event, arg)
+            except BdbQuit:
+                self.pdb_enable = False
+                self.pdb.reset()
+                self.stop_trace(frame)
+                self.start_trace(frame)
 
         return self.tracefunc
 

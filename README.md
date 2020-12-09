@@ -27,7 +27,7 @@ a = 1
 will generate
 
 ```
-<module> (my_script.py:5):
+> <module> (my_script.py:5):
 a:
 0
 ->
@@ -41,22 +41,8 @@ from watchpoints import watch
 
 a = []
 watch(a)
-a.append(1)
-a = {}
-```
-
-```
-<module> (my_script.py:5):
-a:
-[]
-->
-[1]
-
-<module> (my_script.py:6):
-a:
-[1]
-->
-{}
+a.append(1)  # Trigger
+a = {}  # Trigger
 ```
 
 Even better, it can track the changes of the object after the changes of the variable
@@ -66,22 +52,8 @@ from watchpoints import watch
 
 a = []
 watch(a)
-a = {}
-a["a"] = 2
-```
-
-```
-<module> (my_script.py:5):
-a:
-[]
-->
-{}
-
-<module> (my_script).py:6):
-a:
-{}
-->
-{'a': 2}
+a = {}  # Trigger
+a["a"] = 2  # Trigger
 ```
 
 Without doubts, it works whenever the object is changed, even if it's not in the same scope
@@ -98,7 +70,7 @@ func(a)
 ```
 
 ```
-func (my_script.py:4):
+> func (my_script.py:4):
 a:
 {}
 ->
@@ -117,22 +89,8 @@ class MyObj:
 obj = MyObj()
 d = {"a": 0}
 watch(obj.a, d["a"])  # Yes you can do this
-obj.a = 1
-d["a"] = 1
-```
-
-```
-<module> (my_script.py:10):
-obj.a:
-0
-->
-1
-
-<module> (my_script.py:11):
-d["a"]:
-0
-->
-1
+obj.a = 1  # Trigger
+d["a"] = 1  # Trigger
 ```
 
 **watchpoints will try to guess what you want to monitor, and monitor it as you expect**(well most of the time)
@@ -198,6 +156,17 @@ Use ```restore()``` to restore the default callback
 ```python
 watch.restore()
 ```
+
+### Integrating with pdb
+
+watchpoints can be used with pdb with ease. You can trigger pdb just like using ```breakpoint()``` when
+your monitored variable is changed. Simply do
+
+```python
+watch.config(pdb=True)
+```
+
+When you are in pdb, use ```q(uit)``` command to exit pdb, and the next change on the variable will trigger the pdb again.
 
 ## Bugs/Requests
 

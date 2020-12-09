@@ -26,7 +26,7 @@ class WatchPrint:
         p("")
 
     def _file_string(self, exec_info):
-        return f"{exec_info[0]} ({exec_info[1]}:{exec_info[2]}):"
+        return f"> {exec_info[0]} ({exec_info[1]}:{exec_info[2]}):"
 
     def printer(self, obj):
         if type(obj) is str:
