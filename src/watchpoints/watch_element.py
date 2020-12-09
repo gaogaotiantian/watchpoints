@@ -25,7 +25,7 @@ class WatchElement:
         self.alias = alias
         self.default_alias = default_alias
         self.printer = printer
-        self.callback = callback
+        self._callback = callback
         self.exist = True
 
     def changed(self, frame):

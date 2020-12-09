@@ -77,7 +77,7 @@ class Watch:
         for elem in self.watch_list:
             changed, exist = elem.changed(frame)
             if changed:
-                if elem.callback:
+                if elem._callback:
                     elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
                 else:
                     self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))

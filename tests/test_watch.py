@@ -75,6 +75,25 @@ class TestWatch(unittest.TestCase):
         obj.a = 2
         self.assertEqual(cb.counter, 1)
 
+    def test_element_callback(self):
+        cb = CB()
+        a = [1, 2, 3]
+        watch(a, callback=cb)
+        a[0] = 2
+        a.append(4)
+        b = a
+        b.append(5)
+        a = {"a": 1}
+        a["b"] = 2
+
+        def change(d):
+            d["c"] = 3
+
+        change(a)
+
+        self.assertEqual(cb.counter, 6)
+        unwatch()
+
     def test_printer(self):
         watch.restore()
         s = io.StringIO()
