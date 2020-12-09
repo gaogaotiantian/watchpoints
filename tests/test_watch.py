@@ -95,6 +95,37 @@ class TestWatch(unittest.TestCase):
         self.assertEqual(cb.counter, 6)
         unwatch()
 
+    def test_track(self):
+        cb = CB()
+        a = [1, 2, 3]
+        b = [1, 2, 3]
+        watch(a, callback=cb, track="object")
+        a[0] = 2
+        self.assertEqual(cb.counter, 1)
+        a = {}
+        self.assertEqual(cb.counter, 1)
+        watch(b, callback=cb, track=["variable"])
+        b[0] = 2
+        self.assertEqual(cb.counter, 1)
+        b = {}
+        self.assertEqual(cb.counter, 2)
+
+        with self.assertRaises(ValueError):
+            c = []
+            watch(c, track=["invalid"])
+
+        with self.assertRaises(ValueError):
+            c = []
+            watch(c, track="invalid")
+
+        with self.assertRaises(ValueError):
+            c = []
+            watch(c, track=[])
+
+        with self.assertRaises(TypeError):
+            c = []
+            watch(c, track={})
+
     def test_printer(self):
         watch.restore()
         s = io.StringIO()

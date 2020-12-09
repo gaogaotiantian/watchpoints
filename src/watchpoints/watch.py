@@ -28,7 +28,8 @@ class Watch:
                     node,
                     alias=kwargs.get("alias", None),
                     default_alias=name,
-                    callback=kwargs.get("callback", None)
+                    callback=kwargs.get("callback", None),
+                    track=kwargs.get("track", ["variable", "object"])
                 )
             )
 
