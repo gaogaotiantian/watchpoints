@@ -94,7 +94,7 @@ def func(var):
 
 a = {}
 watch(a)
-change(a)
+func(a)
 ```
 
 ```
