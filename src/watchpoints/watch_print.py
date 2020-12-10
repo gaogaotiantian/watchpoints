@@ -27,9 +27,12 @@ class WatchPrint:
         return f"> {exec_info[0]} ({exec_info[1]}:{exec_info[2]}):"
 
     def getsourceline(self, exec_info):
-        with open(exec_info[1]) as f:
-            lines = f.readlines()
-            return lines[exec_info[2] - 1]
+        try:
+            with open(exec_info[1]) as f:
+                lines = f.readlines()
+                return lines[exec_info[2] - 1]
+        except (FileNotFoundError, PermissionError):
+            return "unable to locate the source"
 
     def printer(self, obj):
         if type(obj) is str:
