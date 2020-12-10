@@ -126,6 +126,21 @@ class TestWatch(unittest.TestCase):
             c = []
             watch(c, track={})
 
+        unwatch()
+
+    def test_install(self):
+        watch.install("_watch")
+        _watch()  # noqa
+        cb = CB()
+        a = [1, 2, 3]
+        watch(a, callback=cb)
+        a[0] = 2
+        self.assertEqual(cb.counter, 1)
+        _watch.unwatch()  # noqa
+        watch.uninstall("_watch")
+        with self.assertRaises(NameError):
+            _watch(a)  # noqa
+
     def test_printer(self):
         watch.restore()
         s = io.StringIO()

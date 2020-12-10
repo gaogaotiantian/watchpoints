@@ -91,6 +91,15 @@ class Watch:
         self.file = sys.stderr
         self.pdb_enable = False
 
+    def install(self, func="watch"):
+        import builtins
+        setattr(builtins, func, self)
+
+    def uninstall(self, func="watch"):
+        import builtins
+        if hasattr(builtins, func):
+            delattr(builtins, func)
+
     def tracefunc(self, frame, event, arg):
         dirty = False
         for elem in self.watch_list:

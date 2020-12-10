@@ -28,6 +28,7 @@ will generate
 
 ```
 > <module> (my_script.py:5):
+> a = 1
 a:
 0
 ->
@@ -71,6 +72,7 @@ func(a)
 
 ```
 > func (my_script.py:4):
+>     var["a"] = 1
 a:
 {}
 ->
@@ -172,7 +174,7 @@ watch(a, callback=my_callback)
 
 The callback function takes three arguments
 
-```
+```python
 def my_callback(frame, elem, exec_info)
 ```
 
@@ -202,6 +204,17 @@ watch.config(pdb=True)
 
 When you are in pdb, use ```q(uit)``` command to exit pdb, and the next change on the variable will trigger the pdb again.
 
+
+### Avoid import
+
+Sometimes it's a hassle having to import the function in every single file. You can install the watch function to builtins
+and be able to call it in any files:
+
+```python
+watch.install()  # or watch.install("func_name") and use it as func_name()
+# Remove it from the builtins
+watch.uninstall()  # if installed with a name, pass it to uninstall() as well
+```
 
 ## Limitations
 
