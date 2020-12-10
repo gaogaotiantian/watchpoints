@@ -4,6 +4,7 @@
 
 import sys
 import pprint
+import threading
 
 
 class WatchPrint:
@@ -12,6 +13,9 @@ class WatchPrint:
 
     def __call__(self, frame, elem, exec_info):
         p = self.printer
+        if threading.active_count() > 1:
+            curr_thread = threading.current_thread()
+            p(f"> {curr_thread.name}")
         p(self._file_string(exec_info))
         p(f"> {self.getsourceline(exec_info)}")
         if elem.alias:
@@ -30,7 +34,7 @@ class WatchPrint:
         try:
             with open(exec_info[1]) as f:
                 lines = f.readlines()
-                return lines[exec_info[2] - 1]
+                return f"    {lines[exec_info[2] - 1].strip()}"
         except (FileNotFoundError, PermissionError):
             return "unable to locate the source"
 

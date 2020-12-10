@@ -28,7 +28,7 @@ will generate
 
 ```
 > <module> (my_script.py:5):
-> a = 1
+>     a = 1
 a:
 0
 ->
@@ -95,6 +95,27 @@ obj.a = 1  # Trigger
 d["a"] = 1  # Trigger
 ```
 
+Also, watchpoints supports native ```threading``` library for multi-threading. It will tell you which thread is changing the
+value as well.
+
+```
+> Thread-1
+> run (my_script.py:15):
+>     a[0] = i
+a:
+[0]
+->
+[1]
+
+> Thread-2
+> run (my_script).py:15):
+>     a[0] = i
+a:
+[1]
+->
+[2]
+```
+
 **watchpoints will try to guess what you want to monitor, and monitor it as you expect**(well most of the time)
 
 ### unwatch
@@ -116,8 +137,6 @@ Or you can unwatch everything by passing no argument to it
 ```python
 unwatch()  # unwatch everything
 ```
-
-**monitoring variables will introduce a significant overhead, and should be used for debugging only.**
 
 ### alias
 
@@ -219,7 +238,7 @@ watch.uninstall()  # if installed with a name, pass it to uninstall() as well
 ## Limitations
 
 * watchpoints uses ```sys.settrace()``` so it is not compatible with other libraries that use the same function.
-* watchpoints will slow down your program significantly, like other debuggers
+* watchpoints will slow down your program significantly, like other debuggers, so use it for debugging purpose only
 * Custom objects require ```__eq__``` overload to be tracked correctly as an object
 * at this point, there might be other issues because it's still in development phase
 

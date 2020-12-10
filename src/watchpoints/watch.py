@@ -6,6 +6,7 @@ from bdb import BdbQuit
 import inspect
 import pdb
 import sys
+import threading
 from .util import getargnodes
 from .watch_element import WatchElement
 from .watch_print import WatchPrint
@@ -16,27 +17,30 @@ class Watch:
         self.watch_list = []
         self.tracefunc_stack = []
         self.enable = False
+        self.set_lock = threading.Lock()
+        self.tracefunc_lock = threading.Lock()
         self.restore()
 
     def __call__(self, *args, **kwargs):
-        frame = inspect.currentframe().f_back
-        argnodes = getargnodes(frame)
-        for node, name in argnodes:
-            self.watch_list.append(
-                WatchElement(
-                    frame,
-                    node,
-                    alias=kwargs.get("alias", None),
-                    default_alias=name,
-                    callback=kwargs.get("callback", None),
-                    track=kwargs.get("track", ["variable", "object"])
+        with self.set_lock:
+            frame = inspect.currentframe().f_back
+            argnodes = getargnodes(frame)
+            for node, name in argnodes:
+                self.watch_list.append(
+                    WatchElement(
+                        frame,
+                        node,
+                        alias=kwargs.get("alias", None),
+                        default_alias=name,
+                        callback=kwargs.get("callback", None),
+                        track=kwargs.get("track", ["variable", "object"])
+                    )
                 )
-            )
 
-        if not self.enable and self.watch_list:
-            self.start_trace(frame)
+            if not self.enable and self.watch_list:
+                self.start_trace(frame)
 
-        del frame
+            del frame
 
     def start_trace(self, frame):
         if not self.enable:
@@ -50,6 +54,7 @@ class Watch:
                 frame = frame.f_back
 
             sys.settrace(self.tracefunc)
+            threading.settrace(self.tracefunc)
 
     def stop_trace(self, frame):
         if self.enable:
@@ -61,6 +66,7 @@ class Watch:
                 frame = frame.f_back
 
             sys.settrace(tf)
+            threading.settrace(tf)
 
     def unwatch(self, *args):
         frame = inspect.currentframe().f_back
@@ -101,35 +107,36 @@ class Watch:
             delattr(builtins, func)
 
     def tracefunc(self, frame, event, arg):
-        dirty = False
-        for elem in self.watch_list:
-            changed, exist = elem.changed(frame)
-            if changed:
-                if self.pdb:
-                    self.pdb_enable = True
-                if elem._callback:
-                    elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
-                else:
-                    self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
-                elem.update()
-            if not exist:
-                dirty = True
+        with self.tracefunc_lock:
+            dirty = False
+            for elem in self.watch_list:
+                changed, exist = elem.changed(frame)
+                if changed:
+                    if self.pdb:
+                        self.pdb_enable = True
+                    if elem._callback:
+                        elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+                    else:
+                        self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+                    elem.update()
+                if not exist:
+                    dirty = True
 
-        if dirty:
-            self.watch_list = [elem for elem in self.watch_list if elem.exist]
+            if dirty:
+                self.watch_list = [elem for elem in self.watch_list if elem.exist]
 
-        self._prev_funcname = frame.f_code.co_name
-        self._prev_filename = frame.f_code.co_filename
-        self._prev_lineno = frame.f_lineno
+            self._prev_funcname = frame.f_code.co_name
+            self._prev_filename = frame.f_code.co_filename
+            self._prev_lineno = frame.f_lineno
 
-        if self.pdb_enable:
-            try:
-                self.pdb.trace_dispatch(frame, event, arg)
-            except BdbQuit:
-                self.pdb_enable = False
-                self.pdb.reset()
-                self.stop_trace(frame)
-                self.start_trace(frame)
+            if self.pdb_enable:
+                try:
+                    self.pdb.trace_dispatch(frame, event, arg)
+                except BdbQuit:
+                    self.pdb_enable = False
+                    self.pdb.reset()
+                    self.stop_trace(frame)
+                    self.start_trace(frame)
 
         return self.tracefunc
 
