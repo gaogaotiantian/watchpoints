@@ -6,11 +6,6 @@ import ast
 import sys
 
 
-def to_store(node):
-    node.ctx = ast.Store()
-    return node
-
-
 def ast_parse_node(node):
     """
     :param ast.Node node: an ast node representing an expression of variable
@@ -64,7 +59,7 @@ def ast_parse_node(node):
         elif sys.version_info.minor >= 9 and type(node.slice) is not ast.Slice:
             value_node = node.slice
         else:
-            value_node = ast.Constant(value=None)
+            raise ValueError("Slice is not supported!")
 
         root.body.append(
             ast.Assign(

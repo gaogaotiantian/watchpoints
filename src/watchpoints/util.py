@@ -42,7 +42,7 @@ def getargnodes(frame):
     """
     line = getline(frame)
     m = re.match(r".*?\((.*)\)", line)
-    if not m:
+    if not m:  # pragma: no cover
         raise Exception(f"Unable to locate watch line {line}")
     args = ["".join(s.strip().split()) for s in m.group(1).split(",")]
     try:

@@ -47,3 +47,6 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(len(argnodes), 2)
         self.assertEqual(argnodes[0][1], "a[0]")
         self.assertEqual(argnodes[1][1], "b")
+
+        with self.assertRaises(Exception):
+            argnodes = [i for i in watch(a)]

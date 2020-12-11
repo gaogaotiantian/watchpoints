@@ -22,3 +22,11 @@ class TestWatchPrint(unittest.TestCase):
             wp = WatchPrint(file=sys.stdout)
             wp(None, Elem(), ("a", "b", "c"))
             self.assertNotEqual(s.getvalue(), "")
+
+        s = io.StringIO()
+        with redirect_stdout(s):
+            wp = WatchPrint(file=sys.stdout)
+            elem = Elem()
+            elem.alias = "james"
+            wp(None, elem, ("a", "b", "c"))
+            self.assertIn("james", s.getvalue())
