@@ -1,6 +1,6 @@
 # watchpoints
 
-[![build](https://github.com/gaogaotiantian/watchpoints/workflows/build/badge.svg)](https://github.com/gaogaotiantian/watchpoints/actions?query=workflow%3Abuild)  [![pypi](https://img.shields.io/pypi/v/watchpoints.svg)](https://pypi.org/project/watchpoints/)  [![support-version](https://img.shields.io/pypi/pyversions/watchpoints)](https://img.shields.io/pypi/pyversions/watchpoints)  [![license](https://img.shields.io/github/license/gaogaotiantian/watchpoints)](https://github.com/gaogaotiantian/watchpoints/blob/master/LICENSE)  [![commit](https://img.shields.io/github/last-commit/gaogaotiantian/watchpoints)](https://github.com/gaogaotiantian/watchpoints/commits/master)
+[![build](https://github.com/gaogaotiantian/watchpoints/workflows/build/badge.svg)](https://github.com/gaogaotiantian/watchpoints/actions?query=workflow%3Abuild)  [![coverage](https://img.shields.io/codecov/c/github/gaogaotiantian/watchpoints)](https://codecov.io/gh/gaogaotiantian/watchpoints)  [![pypi](https://img.shields.io/pypi/v/watchpoints.svg)](https://pypi.org/project/watchpoints/)  [![support-version](https://img.shields.io/pypi/pyversions/watchpoints)](https://img.shields.io/pypi/pyversions/watchpoints)  [![license](https://img.shields.io/github/license/gaogaotiantian/watchpoints)](https://github.com/gaogaotiantian/watchpoints/blob/master/LICENSE)  [![commit](https://img.shields.io/github/last-commit/gaogaotiantian/watchpoints)](https://github.com/gaogaotiantian/watchpoints/commits/master)
 
 watchpoints is an easy-to-use, intuitive variable/object monitor tool for python that behaves similar to watchpoints in gdb.
 
@@ -239,6 +239,7 @@ watch.uninstall()  # if installed with a name, pass it to uninstall() as well
 
 * watchpoints uses ```sys.settrace()``` so it is not compatible with other libraries that use the same function.
 * watchpoints will slow down your program significantly, like other debuggers, so use it for debugging purpose only
+* ```watch()``` needs to be used by itself, not nested in other functions, to be correctly parsed
 * Custom objects require ```__eq__``` overload to be tracked correctly as an object
 * at this point, there might be other issues because it's still in development phase
 

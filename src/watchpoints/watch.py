@@ -120,8 +120,8 @@ class Watch:
                         self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
                     elem.update()
                 if not exist:
+                    elem.exist = False
                     dirty = True
-
             if dirty:
                 self.watch_list = [elem for elem in self.watch_list if elem.exist]
 
@@ -135,8 +135,9 @@ class Watch:
                 except BdbQuit:
                     self.pdb_enable = False
                     self.pdb.reset()
-                    self.stop_trace(frame)
-                    self.start_trace(frame)
+                    # BdbQuit will clear sys.settrace()
+                    # We need to get it back
+                    sys.settrace(self.tracefunc)
 
         return self.tracefunc
 

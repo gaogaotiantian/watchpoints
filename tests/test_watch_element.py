@@ -15,9 +15,8 @@ class TestWatchElement(unittest.TestCase):
         return [WatchElement(
                     frame,
                     node,
-                    alias=kwargs.get("alias", None),
                     default_alias=name,
-                    callback=kwargs.get("callback", None)
+                    **kwargs
                 ) for node, name in argnodes]
 
     def test_basic(self):
@@ -61,3 +60,38 @@ class TestWatchElement(unittest.TestCase):
         self.assertTrue(lst[0].same("a"))
         self.assertTrue(lst[0].belong_to([a]))
         self.assertFalse(lst[0].belong_to(["b"]))
+
+    def test_track(self):
+        a = []
+        b = [1, 2]
+        frame = inspect.currentframe()
+        lst = self.helper(a, track="variable")
+        wea = lst[0]
+        lst = self.helper(b, track="object")
+        web = lst[0]
+        a.append(1)
+        self.assertFalse(wea.changed(frame)[0])
+        a = {}
+        self.assertTrue(wea.changed(frame)[0])
+        b[0] = 3
+        self.assertTrue(web.changed(frame)[0])
+        web.update()
+        b = {}
+        self.assertFalse(web.changed(frame)[0])
+
+    def test_invalid(self):
+        a = [1, 2, 3]
+        with self.assertRaises(ValueError):
+            self.helper(a[0:2])
+
+        with self.assertRaises(ValueError):
+            self.helper(a, track=[])
+
+        with self.assertRaises(ValueError):
+            self.helper(a, track=["invalid"])
+
+        with self.assertRaises(ValueError):
+            self.helper(a, track="invalid")
+
+        with self.assertRaises(TypeError):
+            self.helper(a, track=123)

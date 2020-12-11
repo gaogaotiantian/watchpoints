@@ -3,9 +3,13 @@
 
 
 from watchpoints import watch, unwatch
+from watchpoints.watch_print import WatchPrint
+from contextlib import redirect_stdout
+import io
 import unittest
 import threading
 import time
+import sys
 
 
 class myThread (threading.Thread):
@@ -47,3 +51,31 @@ class TestMultiThraed(unittest.TestCase):
 
         unwatch()
         self.assertEqual(cb.counter, 10)
+
+    def test_watch_print(self):
+        class Elem:
+            def __init__(self):
+                self.alias = None
+                self.default_alias = "a"
+                self.prev_obj = ""
+                self.obj = ""
+
+        a = [0]
+        # Create new threads
+        thread1 = myThread(1, "Thread-1", a)
+        thread2 = myThread(2, "Thread-2", a)
+
+        # Start new Threads
+        thread1.start()
+        thread2.start()
+
+        s = io.StringIO()
+        with redirect_stdout(s):
+            wp = WatchPrint(file=sys.stdout)
+            wp(None, Elem(), ("a", "b", "c"))
+            self.assertIn("Thread", s.getvalue())
+
+        thread1.join()
+        thread2.join()
+
+        unwatch()
