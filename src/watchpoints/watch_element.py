@@ -7,7 +7,7 @@ import copy
 
 
 class WatchElement:
-    def __init__(self, frame, node, alias=None, default_alias=None, callback=None, track=["variable", "object"]):
+    def __init__(self, frame, node, **kwargs):
         code = compile(ast_parse_node(node), "<string>", "exec")
         f_locals = frame.f_locals
         exec(code, {}, f_locals)
@@ -22,11 +22,12 @@ class WatchElement:
             if var in f_locals:
                 setattr(self, var.replace("_watchpoints_", ""), f_locals.pop(var))
         self.update()
-        self.alias = alias
-        self.default_alias = default_alias
-        self._callback = callback
+        self.alias = kwargs.get("alias", None)
+        self.default_alias = kwargs.get("default_alias", None)
+        self._callback = kwargs.get("callback", None)
         self.exist = True
-        self.track = track
+        self.track = kwargs.get("track", ["variable", "object"])
+        self.when = kwargs.get("when", None)
 
     @property
     def track(self):
@@ -76,7 +77,13 @@ class WatchElement:
                 except AttributeError:
                     return True, False
         if "object" in self.track:
-            return self.obj != self.prev_obj, True
+            if not isinstance(self.obj, type(self.prev_obj)):
+                raise Exception("object type should not change")  # pragma: no cover
+            else:
+                if self.obj.__class__.__module__ == "builtins":
+                    return self.obj != self.prev_obj, True
+                else:
+                    return self.obj.__dict__ != self.prev_obj.__dict__, True
 
         return False, True
 

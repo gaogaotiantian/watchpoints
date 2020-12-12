@@ -79,6 +79,11 @@ class TestWatch(unittest.TestCase):
         unwatch(obj.a)
         obj.a = 2
         self.assertEqual(cb.counter, 1)
+        watch(obj)
+        obj.a = 3
+        self.assertEqual(cb.counter, 2)
+        obj.a = 3
+        self.assertEqual(cb.counter, 2)
 
     def test_element_callback(self):
         cb = CB()
@@ -130,6 +135,17 @@ class TestWatch(unittest.TestCase):
             c = []
             watch(c, track={})
 
+        unwatch()
+
+    def test_when(self):
+        cb = CB()
+        a = 0
+        watch(a, callback=cb, when=lambda x: x > 0)
+        a = -1
+        a = 1
+        a = 2
+        a = -3
+        self.assertEqual(cb.counter, 2)
         unwatch()
 
     def test_install(self):

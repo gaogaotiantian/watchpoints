@@ -33,7 +33,8 @@ class Watch:
                         alias=kwargs.get("alias", None),
                         default_alias=name,
                         callback=kwargs.get("callback", None),
-                        track=kwargs.get("track", ["variable", "object"])
+                        track=kwargs.get("track", ["variable", "object"]),
+                        when=kwargs.get("when", None)
                     )
                 )
 
@@ -112,12 +113,13 @@ class Watch:
             for elem in self.watch_list:
                 changed, exist = elem.changed(frame)
                 if changed:
-                    if self.pdb:
-                        self.pdb_enable = True
-                    if elem._callback:
-                        elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
-                    else:
-                        self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+                    if not elem.when or elem.when(elem.obj):
+                        if self.pdb:
+                            self.pdb_enable = True
+                        if elem._callback:
+                            elem._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
+                        else:
+                            self._callback(frame, elem, (self._prev_funcname, self._prev_filename, self._prev_lineno))
                     elem.update()
                 if not exist:
                     elem.exist = False

@@ -149,6 +149,18 @@ watch(a, alias="james")
 unwatch("james")
 ```
 
+### conditional callback
+
+You can give an extra condition filter to do "conditional watchpoints". Pass a function ```func(obj)``` which returns ```True```
+if you want to trigger the callback to ```when``` of ```watch```
+
+```python
+a = 0
+watch(a, when=lambda x: x > 0)
+a = -1  # Won't trigger
+a = 1  # Trigger
+```
+
 ### variable vs object
 
 When you do ```watch()``` on an object, you are actually tracking both the object and the variable holding it. In most cases, that's what
@@ -165,23 +177,6 @@ watch(a, track="variable")
 a.append(1)  #  Won't trigger, because "a" still holds the same object
 a = {}  # Trigger
 ```
-
-This is helpful for a customize object. The way watchpoints tracks objects is to do a deepcopy and compare the current one to the copied
-one previously. However, the default ```__eq__``` function compares if they are the "same" object.
-
-```python
-a = MyObj()
-watch(a)
-b = 0  # Trigger because the object "a" holds is "different" than the copied one
-```
-
-```python
-a = MyObj()
-watch(a, track="variable")
-b = 0  # Won't trigger
-```
-
-Of course, you can overload ```__eq__``` function to resolve this issue.
 
 ### customize callback
 
@@ -223,7 +218,6 @@ watch.config(pdb=True)
 
 When you are in pdb, use ```q(uit)``` command to exit pdb, and the next change on the variable will trigger the pdb again.
 
-
 ### Avoid import
 
 Sometimes it's a hassle having to import the function in every single file. You can install the watch function to builtins
@@ -240,7 +234,6 @@ watch.uninstall()  # if installed with a name, pass it to uninstall() as well
 * watchpoints uses ```sys.settrace()``` so it is not compatible with other libraries that use the same function.
 * watchpoints will slow down your program significantly, like other debuggers, so use it for debugging purpose only
 * ```watch()``` needs to be used by itself, not nested in other functions, to be correctly parsed
-* Custom objects require ```__eq__``` overload to be tracked correctly as an object
 * at this point, there might be other issues because it's still in development phase
 
 ## Bugs/Requests

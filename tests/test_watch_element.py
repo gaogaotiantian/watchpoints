@@ -50,6 +50,12 @@ class TestWatchElement(unittest.TestCase):
         self.assertTrue(wea.changed(frame)[0])
         self.assertTrue(web.changed(frame)[0])
         self.assertTrue(wec.changed(frame)[0])
+        lst = self.helper(c)
+        wec = lst[0]
+        c.a = 5
+        self.assertFalse(wec.changed(frame)[0])
+        c.a = 6
+        self.assertTrue(wec.changed(frame)[0])
 
     def test_same(self):
         a = []
@@ -78,6 +84,14 @@ class TestWatchElement(unittest.TestCase):
         web.update()
         b = {}
         self.assertFalse(web.changed(frame)[0])
+
+    def test_when(self):
+        a = [0]
+        lst = self.helper(a, when=lambda x: x[0] > 0)
+        wea = lst[0]
+        self.assertFalse(wea.when(wea.obj))
+        a[0] = 1
+        self.assertTrue(wea.when(wea.obj))
 
     def test_invalid(self):
         a = [1, 2, 3]
