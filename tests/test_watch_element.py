@@ -93,6 +93,52 @@ class TestWatchElement(unittest.TestCase):
         a[0] = 1
         self.assertTrue(wea.when(wea.obj))
 
+    def test_deepcopy(self):
+        frame = inspect.currentframe()
+        a = {"a": [1, 2]}
+        lst = self.helper(a)
+        wea = lst[0]
+        a["a"][0] = 3
+        self.assertFalse(wea.changed(frame)[0])
+        a = {"a": [1, 2]}
+        lst = self.helper(a, deepcopy=True)
+        wea = lst[0]
+        a["a"][0] = 3
+        self.assertTrue(wea.changed(frame)[0])
+
+    def test_object(self):
+        class MyObj:
+            def __init__(self):
+                self.a = {"a": 1}
+
+        class MyObjWithEq:
+            def __init__(self):
+                self.a = {"a": 1}
+
+            def __eq__(self, other):
+                return self.a == other.a
+
+        obj = MyObj()
+        obj_eq = MyObjWithEq()
+        frame = inspect.currentframe()
+
+        lst = self.helper(obj, obj_eq)
+        wobj = lst[0]
+        wobj_eq = lst[1]
+        obj.a["a"] = 2
+        self.assertFalse(wobj.changed(frame)[0])
+        obj_eq.a["a"] = 2
+        self.assertFalse(wobj_eq.changed(frame)[0])
+
+        lst = self.helper(obj, obj_eq, deepcopy=True)
+        wobj = lst[0]
+        wobj_eq = lst[1]
+        obj.a["a"] = 3
+        with self.assertRaises(NotImplementedError):
+            wobj.changed(frame)[0]
+        obj_eq.a["a"] = 3
+        self.assertTrue(wobj_eq.changed(frame)[0])
+
     def test_invalid(self):
         a = [1, 2, 3]
         with self.assertRaises(ValueError):

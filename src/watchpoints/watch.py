@@ -34,7 +34,8 @@ class Watch:
                         default_alias=name,
                         callback=kwargs.get("callback", None),
                         track=kwargs.get("track", ["variable", "object"]),
-                        when=kwargs.get("when", None)
+                        when=kwargs.get("when", None),
+                        deepcopy=kwargs.get("deepcopy", False)
                     )
                 )
 

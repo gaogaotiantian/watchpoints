@@ -178,6 +178,21 @@ a.append(1)  #  Won't trigger, because "a" still holds the same object
 a = {}  # Trigger
 ```
 
+### object compare and deepcopy
+
+Nested object comparison is tricky. It's hard to find a solid standard to compare complicated customized objects.
+By default, watchpoints will do a shallow copy of the object. You can override this behavior by passing ```deepcopy=True``` to ```watch()```
+
+```python
+watch(a, deepcopy=True)
+```
+
+watchpoints will honor ```__eq__``` method for user-defined classes first. If ```__eq__``` is not implemented, watchpoints will compare
+```__dict__```(basically attibures) of the object if using shallow copy, and raise an ```NotImplementedError``` if using deepcopy.
+
+The reason behind this is, if you deepcopied a complicated structure, there's no way for watchpoints to figure out if it's the same object
+without user defined ```__eq__``` function.
+
 ### customize callback
 
 Of course sometimes you want to print in your own format, or even do something more than print. You can use your own callback for monitored variables

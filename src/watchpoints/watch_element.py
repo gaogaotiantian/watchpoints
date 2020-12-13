@@ -14,6 +14,7 @@ class WatchElement:
         self.frame = frame
         self.obj = f_locals.pop("_watchpoints_obj")
         self.prev_obj = self.obj
+        self.prev_obj_repr = self.obj.__repr__()
         self.localvar = None
         self.parent = None
         self.subscr = None
@@ -21,13 +22,14 @@ class WatchElement:
         for var in ("_watchpoints_localvar", "_watchpoints_parent", "_watchpoints_subscr", "_watchpoints_attr"):
             if var in f_locals:
                 setattr(self, var.replace("_watchpoints_", ""), f_locals.pop(var))
-        self.update()
         self.alias = kwargs.get("alias", None)
         self.default_alias = kwargs.get("default_alias", None)
         self._callback = kwargs.get("callback", None)
         self.exist = True
         self.track = kwargs.get("track", ["variable", "object"])
         self.when = kwargs.get("when", None)
+        self.deepcopy = kwargs.get("deepcopy", False)
+        self.update()
 
     @property
     def track(self):
@@ -83,12 +85,23 @@ class WatchElement:
                 if self.obj.__class__.__module__ == "builtins":
                     return self.obj != self.prev_obj, True
                 else:
-                    return self.obj.__dict__ != self.prev_obj.__dict__, True
+                    guess = self.obj.__eq__(self.prev_obj)
+                    if guess is NotImplemented:
+                        if self.deepcopy:
+                            raise NotImplementedError(
+                                f"It's impossible to compare deepcopied customize objects. You need to define __eq__ method for {self.obj.__class__}")
+                        return self.obj.__dict__ != self.prev_obj.__dict__, True
+                    else:
+                        return not guess, True
 
         return False, True
 
     def update(self):
-        self.prev_obj = copy.deepcopy(self.obj)
+        if self.deepcopy:
+            self.prev_obj = copy.deepcopy(self.obj)
+        else:
+            self.prev_obj = copy.copy(self.obj)
+        self.prev_obj_repr = self.obj.__repr__()
 
     def same(self, other):
         if type(other) is str:

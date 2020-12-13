@@ -148,6 +148,18 @@ class TestWatch(unittest.TestCase):
         self.assertEqual(cb.counter, 2)
         unwatch()
 
+    def test_deepcopy(self):
+        cb = CB()
+        a = {"a": [0]}
+        watch(a, callback=cb)
+        a["a"][0] = 1
+        self.assertEqual(cb.counter, 0)
+        unwatch()
+        watch(a, callback=cb, deepcopy=True)
+        a["a"][0] = 2
+        self.assertEqual(cb.counter, 1)
+        unwatch()
+
     def test_install(self):
         watch.install("_watch")
         _watch()  # noqa
