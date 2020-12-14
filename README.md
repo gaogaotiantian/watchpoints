@@ -27,8 +27,10 @@ a = 1
 will generate
 
 ```
-> <module> (my_script.py:5):
->     a = 1
+====== Watchpoints Triggered ======
+Call Stack (most recent call last):
+  <module> (my_script.py:5):
+>   a = 1
 a:
 0
 ->
@@ -71,8 +73,12 @@ func(a)
 ```
 
 ```
-> func (my_script.py:4):
->     var["a"] = 1
+====== Watchpoints Triggered ======
+Call Stack (most recent call last):
+  <module> (my_script.py:8):
+>   func(a)
+  func (my_script.py:4):
+>   var["a"] = 1
 a:
 {}
 ->
@@ -99,21 +105,19 @@ Also, watchpoints supports native ```threading``` library for multi-threading. I
 value as well.
 
 ```
-> Thread-1
-> run (my_script.py:15):
->     a[0] = i
+====== Watchpoints Triggered ======
+---- Thread-1 ----
+Call Stack (most recent call last):
+  _bootstrap (/usr/lib/python3.8/threading.py:890):
+>   self._bootstrap_inner()
+  _bootstrap_inner (/usr/lib/python3.8/threading.py:932):
+>   self.run()
+  run (my_script.py:15):
+>   a[0] = i
 a:
 [0]
 ->
 [1]
-
-> Thread-2
-> run (my_script).py:15):
->     a[0] = i
-a:
-[1]
-->
-[2]
 ```
 
 **watchpoints will try to guess what you want to monitor, and monitor it as you expect**(well most of the time)
@@ -192,6 +196,15 @@ watchpoints will honor ```__eq__``` method for user-defined classes first. If ``
 
 The reason behind this is, if you deepcopied a complicated structure, there's no way for watchpoints to figure out if it's the same object
 without user defined ```__eq__``` function.
+
+### stack limit
+
+You can specify the call stack limit printed using ```watch.config()```. The default value is ```5```, any positive integer is accepted.
+You can use ```None``` for unlimited call stack, which means it will prints out all the frames.
+
+```python
+watch.config(stack_limit=10)
+```
 
 ### customize callback
 

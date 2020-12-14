@@ -6,6 +6,7 @@ from watchpoints import watch, unwatch
 from watchpoints.watch_print import WatchPrint
 from contextlib import redirect_stdout
 import io
+import inspect
 import unittest
 import threading
 import time
@@ -72,7 +73,7 @@ class TestMultiThraed(unittest.TestCase):
         s = io.StringIO()
         with redirect_stdout(s):
             wp = WatchPrint(file=sys.stdout)
-            wp(None, Elem(), ("a", "b", "c"))
+            wp(inspect.currentframe(), Elem(), ("a", "b", "c"))
             self.assertIn("Thread", s.getvalue())
 
         thread1.join()

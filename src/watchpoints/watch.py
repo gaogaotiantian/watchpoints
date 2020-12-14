@@ -17,6 +17,7 @@ class Watch:
         self.watch_list = []
         self.tracefunc_stack = []
         self.enable = False
+        self.stack_limit = 5
         self.set_lock = threading.Lock()
         self.tracefunc_lock = threading.Lock()
         self.restore()
@@ -93,6 +94,9 @@ class Watch:
         if "file" in kwargs:
             self.file = kwargs["file"]
 
+        if "stack_limit" in kwargs:
+            self.stack_limit = kwargs["stack_limit"]
+
     def restore(self):
         self._callback = self._default_callback
         self.pdb = None
@@ -145,5 +149,5 @@ class Watch:
         return self.tracefunc
 
     def _default_callback(self, frame, elem, exec_info):
-        wp = WatchPrint(self.file)
+        wp = WatchPrint(self.file, stack_limit=self.stack_limit)
         wp(frame, elem, exec_info)

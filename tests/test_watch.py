@@ -183,3 +183,15 @@ class TestWatch(unittest.TestCase):
             a[0] = 2
             unwatch()
             self.assertNotEqual(s.getvalue(), "")
+
+    def test_stack_limit(self):
+        watch.restore()
+        watch.config(stack_limit=1)
+        s = io.StringIO()
+        with redirect_stdout(s):
+            watch.config(file=sys.stdout)
+            a = [1, 2, 3]
+            watch(a)
+            a[0] = 2
+            unwatch()
+            self.assertEqual(s.getvalue().count("> "), 1)

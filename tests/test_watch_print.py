@@ -4,6 +4,7 @@
 
 from contextlib import redirect_stdout
 import io
+import inspect
 import unittest
 import sys
 from watchpoints.watch_print import WatchPrint
@@ -20,7 +21,7 @@ class TestWatchPrint(unittest.TestCase):
         s = io.StringIO()
         with redirect_stdout(s):
             wp = WatchPrint(file=sys.stdout)
-            wp(None, Elem(), ("a", "b", "c"))
+            wp(inspect.currentframe(), Elem(), ("a", "b", "c"))
             self.assertNotEqual(s.getvalue(), "")
 
         s = io.StringIO()
@@ -28,5 +29,5 @@ class TestWatchPrint(unittest.TestCase):
             wp = WatchPrint(file=sys.stdout)
             elem = Elem()
             elem.alias = "james"
-            wp(None, elem, ("a", "b", "c"))
+            wp(inspect.currentframe(), elem, ("a", "b", "c"))
             self.assertIn("james", s.getvalue())
