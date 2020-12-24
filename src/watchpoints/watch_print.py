@@ -50,7 +50,7 @@ class WatchPrint:
 
     def getsourceline(self, exec_info):
         try:
-            with open(exec_info[1]) as f:
+            with open(exec_info[1], encoding="utf-8") as f:
                 lines = f.readlines()
                 return f">   {lines[exec_info[2] - 1].strip()}"
         except (FileNotFoundError, PermissionError):

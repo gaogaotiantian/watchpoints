@@ -16,7 +16,7 @@ def getline(frame):
     lineno = frame.f_lineno
     filename = frame.f_code.co_filename
 
-    with open(filename, "r") as f:
+    with open(filename, "r", encoding="utf-8") as f:
         lines = f.readlines()
         if sys.version_info.minor <= 7:
             # For python 3.6 and 3.7, f_lineno does not return correct position
