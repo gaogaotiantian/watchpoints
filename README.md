@@ -197,6 +197,32 @@ watchpoints will honor ```__eq__``` method for user-defined classes first. If ``
 The reason behind this is, if you deepcopied a complicated structure, there's no way for watchpoints to figure out if it's the same object
 without user defined ```__eq__``` function.
 
+#### customize copy and compare
+
+For your own data structures, you can provide a customized copy and/or customized compare function for watchpoints to better suit your need.
+
+watchpoints will use the copy function you provide to copy the object for reference, and use your compare function to check if that
+object is changed. If copy function or compare function is not provided, it falls to default as mentioned above.
+
+```cmp``` argument takes a function that will take two objects as arguments and return a ```boolean``` representing whether the objects
+are **different**
+
+```python
+def my_cmp(obj1, obj2):
+    return obj1.id != obj2.id
+
+watch(a, cmp=my_cmp)
+```
+
+```copy``` argument takes a function that will take a object and return a copy of it
+
+```python
+def my_copy(obj):
+    return MyObj(id=obj.id)
+
+watch(a, copy=my_copy)
+```
+
 ### stack limit
 
 You can specify the call stack limit printed using ```watch.config()```. The default value is ```5```, any positive integer is accepted.

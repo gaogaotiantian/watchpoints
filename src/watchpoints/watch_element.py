@@ -29,6 +29,8 @@ class WatchElement:
         self.track = kwargs.get("track", ["variable", "object"])
         self.when = kwargs.get("when", None)
         self.deepcopy = kwargs.get("deepcopy", False)
+        self.cmp = kwargs.get("cmp", None)
+        self.copy = kwargs.get("copy", None)
         self.update()
 
     @property
@@ -82,7 +84,9 @@ class WatchElement:
             if not isinstance(self.obj, type(self.prev_obj)):
                 raise Exception("object type should not change")  # pragma: no cover
             else:
-                if self.obj.__class__.__module__ == "builtins":
+                if self.cmp:
+                    return self.cmp(self.prev_obj, self.obj), True
+                elif self.obj.__class__.__module__ == "builtins":
                     return self.obj != self.prev_obj, True
                 else:
                     guess = self.obj.__eq__(self.prev_obj)
@@ -97,7 +101,9 @@ class WatchElement:
         return False, True
 
     def update(self):
-        if self.deepcopy:
+        if self.copy:
+            self.prev_obj = self.copy(self.obj)
+        elif self.deepcopy:
             self.prev_obj = copy.deepcopy(self.obj)
         else:
             self.prev_obj = copy.copy(self.obj)

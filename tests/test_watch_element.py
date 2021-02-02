@@ -106,6 +106,33 @@ class TestWatchElement(unittest.TestCase):
         a["a"][0] = 3
         self.assertTrue(wea.changed(frame)[0])
 
+    def test_custom_cmp(self):
+
+        def cmp(obj1, obj2):
+            return False
+
+        frame = inspect.currentframe()
+        a = {"a": 1}
+        lst = self.helper(a, cmp=cmp)
+        wea = lst[0]
+        a["a"] = 0
+        self.assertFalse(wea.changed(frame)[0])
+
+    def test_custom_copy(self):
+
+        def copy(obj1):
+            return {"a": 0}
+
+        frame = inspect.currentframe()
+        a = {"a": 1}
+        lst = self.helper(a, copy=copy)
+        wea = lst[0]
+        a["a"] = 0
+        self.assertFalse(wea.changed(frame)[0])
+
+        a["a"] = 1
+        self.assertTrue(wea.changed(frame)[0])
+
     def test_object(self):
         class MyObj:
             def __init__(self):
