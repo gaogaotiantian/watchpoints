@@ -160,6 +160,34 @@ class TestWatch(unittest.TestCase):
         self.assertEqual(cb.counter, 1)
         unwatch()
 
+    def test_custom_copy(self):
+
+        def copy(obj):
+            return {"a": 0}
+
+        cb = CB()
+        a = {"a": 0}
+        watch(a, callback=cb, copy=copy)
+        a["a"] = 1
+        self.assertEqual(cb.counter, 1)
+        a["a"] = 1
+        self.assertGreater(cb.counter, 2)
+        unwatch()
+
+    def test_custom_cmp(self):
+
+        def cmp(obj1, obj2):
+            return False
+
+        cb = CB()
+        a = {"a": 0}
+        watch(a, callback=cb, cmp=cmp)
+        a["a"] = 1
+        self.assertEqual(cb.counter, 0)
+        a["a"] = 2
+        self.assertEqual(cb.counter, 0)
+        unwatch()
+
     def test_install(self):
         watch.install("_watch")
         _watch()  # noqa

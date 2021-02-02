@@ -36,7 +36,9 @@ class Watch:
                         callback=kwargs.get("callback", None),
                         track=kwargs.get("track", ["variable", "object"]),
                         when=kwargs.get("when", None),
-                        deepcopy=kwargs.get("deepcopy", False)
+                        deepcopy=kwargs.get("deepcopy", False),
+                        cmp=kwargs.get("cmp", None),
+                        copy=kwargs.get("copy", None)
                     )
                 )
 
