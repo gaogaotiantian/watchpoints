@@ -60,7 +60,7 @@ class WatchElement:
         if "variable" in self.track:
             if frame is self.frame and self.localvar is not None:
                 if self.localvar in frame.f_locals:
-                    if frame.f_locals[self.localvar] != self.obj:
+                    if frame.f_locals[self.localvar] is not self.obj:
                         self.obj = frame.f_locals[self.localvar]
                         return True, True
                 else:
@@ -68,14 +68,14 @@ class WatchElement:
 
             if self.parent is not None and self.subscr is not None:
                 try:
-                    if self.parent[self.subscr] != self.obj:
+                    if self.parent[self.subscr] is not self.obj:
                         self.obj = self.parent[self.subscr]
                         return True, True
                 except (IndexError, KeyError):
                     return True, False
             elif self.parent is not None and self.attr is not None:
                 try:
-                    if getattr(self.parent, self.attr) != self.obj:
+                    if getattr(self.parent, self.attr) is not self.obj:
                         self.obj = getattr(self.parent, self.attr)
                         return True, True
                 except AttributeError:
