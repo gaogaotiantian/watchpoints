@@ -61,7 +61,7 @@ class TestPandas(unittest.TestCase):
 
         # Other stuff happens
         a = 2
-        b = a + 5
+        _ = a + 5
 
         self.assertEqual(cb.counter, 0)
 
