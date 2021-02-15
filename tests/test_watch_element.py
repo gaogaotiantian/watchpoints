@@ -12,12 +12,14 @@ class TestWatchElement(unittest.TestCase):
     def helper(self, *args, **kwargs):
         frame = inspect.currentframe().f_back
         argnodes = getargnodes(frame)
-        return [WatchElement(
-                    frame,
-                    node,
-                    default_alias=name,
-                    **kwargs
-                ) for node, name in argnodes]
+        return [
+            WatchElement(
+                frame,
+                node,
+                default_alias=name,
+                **kwargs
+            ) for node, name in argnodes
+        ]
 
     def test_basic(self):
         a = 0

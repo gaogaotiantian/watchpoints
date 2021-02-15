@@ -2,18 +2,14 @@
 # For details: https://github.com/gaogaotiantian/watchpoints/blob/master/NOTICE.txt
 
 
-import io
-import sys
 import unittest
-from contextlib import redirect_stdout
+from watchpoints import unwatch, watch
 
 try:
     import pandas as pd
-
     NO_PANDAS = False
 except ImportError:
     NO_PANDAS = True
-from watchpoints import unwatch, watch
 
 
 class CB:
@@ -25,7 +21,7 @@ class CB:
 
 
 @unittest.skipIf(
-    NO_PANDAS == True, reason="You need to install pandas. (pip install pandas)"
+    NO_PANDAS, reason="You need to install pandas. (pip install pandas)"
 )
 class TestPandas(unittest.TestCase):
     def test_series(self):
