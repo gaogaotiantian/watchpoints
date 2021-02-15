@@ -93,7 +93,8 @@ class WatchElement:
                     if guess is NotImplemented:
                         if self.deepcopy:
                             raise NotImplementedError(
-                                f"It's impossible to compare deepcopied customize objects. You need to define __eq__ method for {self.obj.__class__}")
+                                f"It's impossible to compare deepcopied customize objects."
+                                f"You need to define __eq__ method for {self.obj.__class__}")
                         return self.obj.__dict__ != self.prev_obj.__dict__, True
                     else:
                         return not guess, True
