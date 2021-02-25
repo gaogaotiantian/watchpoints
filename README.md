@@ -247,7 +247,7 @@ def my_callback(frame, elem, exec_info)
 ```
 
 * ```frame``` is the current frame when a change is detected.
-* ```elem``` is a ```WatchElement``` object that I'm to lazy to describe for now.
+* ```elem``` is a ```WatchElement``` object that I'm too lazy to describe for now.
 * ```exec_info``` is a tuple of ```(funcname, filename, lineno)``` of the line that changed the variable
 
 You can also set change the callback function globally by
