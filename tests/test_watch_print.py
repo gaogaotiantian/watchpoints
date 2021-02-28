@@ -6,6 +6,7 @@ from contextlib import redirect_stdout
 import io
 import inspect
 import unittest
+import os.path
 import sys
 from watchpoints.watch_print import WatchPrint
 
@@ -31,3 +32,15 @@ class TestWatchPrint(unittest.TestCase):
             elem.alias = "james"
             wp(inspect.currentframe(), elem, ("a", "b", "c"))
             self.assertIn("james", s.getvalue())
+
+    def test_getsourceline(self):
+        wp = WatchPrint()
+        line = wp.getsourceline((
+            None,
+            os.path.join(os.path.dirname(__file__), "data", "watchpoints-0.1.5-py3.8.egg", "watchpoints", "watch_print.py"),
+            12
+        ))
+        self.assertEqual(line, ">   class WatchPrint:")
+
+        line = wp.getsourceline((None, "file/not/exist", 100))
+        self.assertEqual(line, "unable to locate the source")
