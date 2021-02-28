@@ -5,6 +5,8 @@
 import sys
 import pprint
 import threading
+import os.path
+import zipfile
 
 
 class WatchPrint:
@@ -50,10 +52,26 @@ class WatchPrint:
 
     def getsourceline(self, exec_info):
         try:
-            with open(exec_info[1], encoding="utf-8") as f:
-                lines = f.readlines()
-                return f">   {lines[exec_info[2] - 1].strip()}"
-        except (FileNotFoundError, PermissionError):
+            filename = exec_info[1]
+            if os.path.exists(filename):
+                with open(exec_info[1], encoding="utf-8") as f:
+                    lines = f.readlines()
+                    return f">   {lines[exec_info[2] - 1].strip()}"
+            else:
+                # We may have an egg file, we try to figure out if we have a zipfile
+                # in the path and unzip that
+                potential_egg = filename
+                f_paths = []
+                while os.path.dirname(potential_egg) != potential_egg:
+                    potential_egg, f_path = os.path.split(potential_egg)
+                    f_paths.append(f_path)
+                    if zipfile.is_zipfile(potential_egg):
+                        with zipfile.ZipFile(potential_egg) as zf:
+                            with zf.open("/".join(reversed(f_paths))) as f:
+                                lines = f.readlines()
+                                return f">   {lines[exec_info[2] - 1].decode('utf-8').strip()}"
+            return "unable to locate the source"
+        except (FileNotFoundError, PermissionError):  # pragma: no cover
             return "unable to locate the source"
 
     def printer(self, obj):
