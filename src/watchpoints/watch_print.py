@@ -67,7 +67,7 @@ class WatchPrint:
                     f_paths.append(f_path)
                     if zipfile.is_zipfile(potential_egg):
                         with zipfile.ZipFile(potential_egg) as zf:
-                            with zf.open("/".join(*reversed(f_paths))) as f:
+                            with zf.open("/".join(reversed(f_paths))) as f:
                                 lines = f.readlines()
                                 return f">   {lines[exec_info[2] - 1].decode('utf-8').strip()}"
             return "unable to locate the source"
