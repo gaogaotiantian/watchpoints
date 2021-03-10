@@ -4,6 +4,7 @@
 
 import ast
 from io import StringIO
+import inspect
 import re
 try:
     import readline
@@ -26,6 +27,8 @@ def getline(frame):
             code_string = readline.get_history_item(his_length)
         except NameError:
             raise Exception("watchpoints does not support REPL on Windows")
+    elif filename.startswith("<ipython-input"):
+        return inspect.getsource(frame)
     else:
         with open(filename, "r", encoding="utf-8") as f:
             lines = f.readlines()
