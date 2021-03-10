@@ -4,6 +4,7 @@
 
 import unittest
 import inspect
+import sys
 from watchpoints.util import getline, getargnodes
 
 
@@ -22,6 +23,42 @@ class TestUtil(unittest.TestCase):
             b
         )
         self.assertEqual(line, "line = watch ( a , b )")
+
+    def test_getline_with_interpreter(self):
+
+        class FakeCode:
+            def __init__(self):
+                self.co_filename = "<stdin>"
+
+        class FakeFrame:
+            def __init__(self):
+                self.f_lineno = 1
+                self.f_code = FakeCode()
+
+        frame = FakeFrame()
+        if sys.platform == "win32":
+            with self.assertRaises(Exception):
+                line = getline(frame)
+        else:
+            import readline
+            readline.add_history("watch(a)")
+            line = getline(frame)
+            self.assertEqual(line, "watch(a)")
+
+    def test_getline_with_ipython(self):
+        class FakeCode:
+            def __init__(self):
+                self.co_filename = "<ipython-input-1234567>"
+
+        class FakeFrame:
+            def __init__(self):
+                self.f_lineno = 1
+                self.f_code = FakeCode()
+
+        frame = FakeFrame()
+        with unittest.mock.patch.object(inspect, "getsource", return_value="abc") as _:
+            line = getline(frame)
+            self.assertEqual(line, "abc")
 
     def test_getargnodes(self):
         def watch(*args):
