@@ -24,7 +24,6 @@ class TestUtil(unittest.TestCase):
         )
         self.assertEqual(line, "line = watch ( a , b )")
 
-    @unittest.skipIf(sys.platform == "win32", "windows is not supported")
     def test_getline_with_interpreter(self):
 
         class FakeCode:
@@ -39,8 +38,12 @@ class TestUtil(unittest.TestCase):
         frame = FakeFrame()
         import readline
         readline.add_history("watch(a)")
-        line = getline(frame)
-        self.assertEqual(line, "watch(a)")
+        if sys.platform == "win32":
+            with self.assertRaises(Exception):
+                line = getline(frame)
+        else:
+            line = getline(frame)
+            self.assertEqual(line, "watch(a)")
 
     def test_getargnodes(self):
         def watch(*args):
