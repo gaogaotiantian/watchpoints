@@ -36,12 +36,12 @@ class TestUtil(unittest.TestCase):
                 self.f_code = FakeCode()
 
         frame = FakeFrame()
-        import readline
-        readline.add_history("watch(a)")
         if sys.platform == "win32":
             with self.assertRaises(Exception):
                 line = getline(frame)
         else:
+            import readline
+            readline.add_history("watch(a)")
             line = getline(frame)
             self.assertEqual(line, "watch(a)")
 
