@@ -38,7 +38,11 @@ class Watch:
                         when=kwargs.get("when", None),
                         deepcopy=kwargs.get("deepcopy", False),
                         cmp=kwargs.get("cmp", None),
-                        copy=kwargs.get("copy", None)
+                        copy=kwargs.get("copy", None),
+                        watch_print=WatchPrint(
+                            file=kwargs.get("file", self.file),
+                            stack_limit=kwargs.get("stack_limit", self.stack_limit)
+                        )
                     )
                 )
 
@@ -151,5 +155,4 @@ class Watch:
         return self.tracefunc
 
     def _default_callback(self, frame, elem, exec_info):
-        wp = WatchPrint(self.file, stack_limit=self.stack_limit)
-        wp(frame, elem, exec_info)
+        elem.watch_print(frame, elem, exec_info)

@@ -18,6 +18,10 @@ class CB:
 
 
 class TestWatch(unittest.TestCase):
+    def setUp(self):
+        unwatch()
+        watch.restore()
+
     def test_basic(self):
         cb = CB()
         watch.config(callback=cb)
@@ -202,7 +206,6 @@ class TestWatch(unittest.TestCase):
             _watch(a)  # noqa
 
     def test_printer(self):
-        watch.restore()
         s = io.StringIO()
         with redirect_stdout(s):
             watch.config(file=sys.stdout)
@@ -212,8 +215,7 @@ class TestWatch(unittest.TestCase):
             unwatch()
             self.assertNotEqual(s.getvalue(), "")
 
-    def test_stack_limit(self):
-        watch.restore()
+    def test_stack_limit_global(self):
         watch.config(stack_limit=1)
         s = io.StringIO()
         with redirect_stdout(s):
@@ -223,3 +225,23 @@ class TestWatch(unittest.TestCase):
             a[0] = 2
             unwatch()
             self.assertEqual(s.getvalue().count("> "), 1)
+
+    def test_stack_limit_local(self):
+        s = io.StringIO()
+        with redirect_stdout(s):
+            a = [1, 2, 3]
+            watch(a, file=sys.stdout, stack_limit=1)
+            a[0] = 2
+            unwatch()
+            self.assertEqual(s.getvalue().count("> "), 1)
+
+    def test_write_to_file(self):
+        f = open("tmp_test.log", "w")
+        a = [1, 2, 3]
+        watch(a, file=f, stack_limit=1)
+        a[0] = 2
+        unwatch()
+        f.close()
+        with open("tmp_test.log") as f:
+            data = f.read()
+        self.assertEqual(data.count("> "), 1)
