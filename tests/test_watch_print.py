@@ -11,14 +11,16 @@ import sys
 from watchpoints.watch_print import WatchPrint
 
 
+class Elem:
+    def __init__(self):
+        self.alias = None
+        self.default_alias = "a"
+        self.prev_obj = ""
+        self.obj = ""
+
+
 class TestWatchPrint(unittest.TestCase):
     def test_basic(self):
-        class Elem:
-            def __init__(self):
-                self.alias = None
-                self.default_alias = "a"
-                self.prev_obj = ""
-                self.obj = ""
         s = io.StringIO()
         with redirect_stdout(s):
             wp = WatchPrint(file=sys.stdout)
@@ -44,3 +46,12 @@ class TestWatchPrint(unittest.TestCase):
 
         line = wp.getsourceline((None, "file/not/exist", 100))
         self.assertEqual(line, "unable to locate the source")
+
+    def test_print_to_file(self):
+        wp = WatchPrint(file="tmp_test.log")
+        wp(inspect.currentframe(), Elem(), ("function", "filename", "c"))
+        with open("tmp_test.log") as f:
+            data = f.read()
+        os.remove("tmp_test.log")
+        self.assertIn("function", data)
+        self.assertIn("filename", data)
