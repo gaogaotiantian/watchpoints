@@ -75,7 +75,15 @@ class WatchPrint:
             return "unable to locate the source"
 
     def printer(self, obj):
-        if type(obj) is str:
-            print(obj, file=self.file)
+
+        def do_print(obj, stream):
+            if type(obj) is str:
+                print(obj, file=stream)
+            else:
+                pprint.pprint(obj, stream=stream)
+
+        if isinstance(self.file, str):
+            with open(self.file, "a") as f:
+                do_print(obj, f)
         else:
-            pprint.pprint(obj, stream=self.file)
+            do_print(obj, self.file)
