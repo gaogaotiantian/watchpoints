@@ -3,6 +3,7 @@
 
 
 from .ast_monkey import ast_parse_node
+from .watch_print import WatchPrint
 import copy
 
 
@@ -31,6 +32,7 @@ class WatchElement:
         self.deepcopy = kwargs.get("deepcopy", False)
         self.cmp = kwargs.get("cmp", None)
         self.copy = kwargs.get("copy", None)
+        self.watch_print = kwargs.get("watch_print", WatchPrint())
         self.update()
 
     @property
