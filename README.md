@@ -142,6 +142,28 @@ Or you can unwatch everything by passing no argument to it
 unwatch()  # unwatch everything
 ```
 
+### print to different stream
+
+Like the ``print`` function, you can choose the output stream for watch print using ``file`` argument. The default
+value is ``sys.stderr``.
+
+```python
+f = open("watch.log", "w")
+a = 0
+watch(a, file=f)
+a = 1
+f.close()
+```
+
+Be aware that **the stream needs to be available when the variable is changed**! So the following code **WON'T WORK**:
+
+```python
+a = 0
+with open("watch.log", "w") as f:
+    watch(a, file=f)
+a = 1
+```
+
 ### alias
 
 You can give an alias to a monitored variable, so you can unwatch it anywhere. And the alias will be printed instead of the variable name
@@ -230,6 +252,13 @@ You can use ```None``` for unlimited call stack, which means it will prints out 
 
 ```python
 watch.config(stack_limit=10)
+```
+
+You can also set different stack limits for each monitored variable by passing ``stack_limit`` argument to ``watch``
+
+```python
+# This will only change stack_limit for a
+watch(a, stack_limit=10)
 ```
 
 ### customize callback
