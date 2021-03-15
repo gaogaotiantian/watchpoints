@@ -164,6 +164,18 @@ with open("watch.log", "w") as f:
 a = 1
 ```
 
+Or you could just give a filename to ``watch``. It will append to the file.
+
+```python
+watch(a, file="watch.log")
+```
+
+Use config if you want to make it global
+
+```python
+watch.config(file="watch.log")
+```
+
 ### alias
 
 You can give an alias to a monitored variable, so you can unwatch it anywhere. And the alias will be printed instead of the variable name

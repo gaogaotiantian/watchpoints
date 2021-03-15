@@ -4,6 +4,7 @@
 
 from contextlib import redirect_stdout
 import io
+import os
 import sys
 import unittest
 from watchpoints import watch, unwatch
@@ -235,7 +236,7 @@ class TestWatch(unittest.TestCase):
             unwatch()
             self.assertEqual(s.getvalue().count("> "), 1)
 
-    def test_write_to_file(self):
+    def test_write_to_file_stream(self):
         f = open("tmp_test.log", "w")
         a = [1, 2, 3]
         watch(a, file=f, stack_limit=1)
@@ -244,4 +245,15 @@ class TestWatch(unittest.TestCase):
         f.close()
         with open("tmp_test.log") as f:
             data = f.read()
+        os.remove("tmp_test.log")
         self.assertEqual(data.count("> "), 1)
+
+    def test_write_to_file(self):
+        a = [1, 2, 3]
+        watch(a, file="tmp_test.log")
+        a[0] = 2
+        unwatch()
+        with open("tmp_test.log") as f:
+            data = f.read()
+        os.remove("tmp_test.log")
+        self.assertIn("a[0] = 2", data)
