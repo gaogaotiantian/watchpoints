@@ -37,6 +37,6 @@ setuptools.setup(
     ],
     python_requires=">=3.6",
     install_requires = [
-        "objprint>=0.0.2"
+        "objprint>=0.0.3"
     ]
 )
