@@ -3,8 +3,8 @@
 
 
 import sys
-import pprint
 import threading
+from objprint import objstr
 import os.path
 import zipfile
 
@@ -80,7 +80,7 @@ class WatchPrint:
             if type(obj) is str:
                 print(obj, file=stream)
             else:
-                pprint.pprint(obj, stream=stream)
+                print(objstr(obj), file=stream)
 
         if isinstance(self.file, str):
             with open(self.file, "a") as f:
