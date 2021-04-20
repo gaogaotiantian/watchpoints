@@ -62,7 +62,7 @@ class WatchElement:
         if "variable" in self.track:
             if frame is self.frame and self.localvar is not None:
                 if self.localvar in frame.f_locals:
-                    if frame.f_locals[self.localvar] is not self.obj:
+                    if self.obj_changed(frame.f_locals[self.localvar]):
                         self.obj = frame.f_locals[self.localvar]
                         return True, True
                 else:
@@ -70,14 +70,14 @@ class WatchElement:
 
             if self.parent is not None and self.subscr is not None:
                 try:
-                    if self.parent[self.subscr] is not self.obj:
+                    if self.obj_changed(self.parent[self.subscr]):
                         self.obj = self.parent[self.subscr]
                         return True, True
                 except (IndexError, KeyError):
                     return True, False
             elif self.parent is not None and self.attr is not None:
                 try:
-                    if getattr(self.parent, self.attr) is not self.obj:
+                    if self.obj_changed(getattr(self.parent, self.attr)):
                         self.obj = getattr(self.parent, self.attr)
                         return True, True
                 except AttributeError:
@@ -86,22 +86,27 @@ class WatchElement:
             if not isinstance(self.obj, type(self.prev_obj)):
                 raise Exception("object type should not change")  # pragma: no cover
             else:
-                if self.cmp:
-                    return self.cmp(self.prev_obj, self.obj), True
-                elif self.obj.__class__.__module__ == "builtins":
-                    return self.obj != self.prev_obj, True
-                else:
-                    guess = self.obj.__eq__(self.prev_obj)
-                    if guess is NotImplemented:
-                        if self.deepcopy:
-                            raise NotImplementedError(
-                                f"It's impossible to compare deepcopied customize objects."
-                                f"You need to define __eq__ method for {self.obj.__class__}")
-                        return self.obj.__dict__ != self.prev_obj.__dict__, True
-                    else:
-                        return not guess, True
+                return self.obj_changed(self.prev_obj), True
 
         return False, True
+
+    def obj_changed(self, other):
+        if not isinstance(self.obj, type(other)):
+            return True
+        elif self.cmp:
+            return self.cmp(self.obj, other)
+        elif self.obj.__class__.__module__ == "builtins":
+            return self.obj != other
+        else:
+            guess = self.obj.__eq__(other)
+            if guess is NotImplemented:
+                if self.deepcopy:
+                    raise NotImplementedError(
+                        f"It's impossible to compare deepcopied customize objects."
+                        f"You need to define __eq__ method for {self.obj.__class__}")
+                return self.obj.__dict__ != other.__dict__
+            else:
+                return not guess
 
     def update(self):
         if self.copy:
