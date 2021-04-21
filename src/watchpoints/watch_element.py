@@ -11,7 +11,8 @@ class WatchElement:
     def __init__(self, frame, node, **kwargs):
         code = compile(ast_parse_node(node), "<string>", "exec")
         f_locals = frame.f_locals
-        exec(code, {}, f_locals)
+        f_globals = frame.f_globals
+        exec(code, f_globals, f_locals)
         self.frame = frame
         self.obj = f_locals.pop("_watchpoints_obj")
         self.prev_obj = self.obj

@@ -4,6 +4,7 @@
 
 import unittest
 import inspect
+import os
 from watchpoints.watch_element import WatchElement
 from watchpoints.util import getargnodes
 
@@ -167,6 +168,10 @@ class TestWatchElement(unittest.TestCase):
             wobj.changed(frame)[0]
         obj_eq.a["a"] = 3
         self.assertTrue(wobj_eq.changed(frame)[0])
+
+    def test_global_module(self):
+        os.environ['a'] = 'test'
+        self.helper(os.environ['a'])
 
     def test_invalid(self):
         a = [1, 2, 3]
