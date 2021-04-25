@@ -2,6 +2,7 @@
 # For details: https://github.com/gaogaotiantian/watchpoints/blob/master/NOTICE.txt
 
 
+import atexit
 from .watch import Watch
 
 __version__ = "0.2.4"
@@ -15,3 +16,4 @@ all = [
 
 watch = Watch()
 unwatch = watch.unwatch
+atexit.register(unwatch)

@@ -69,7 +69,6 @@ class Watch:
         if self.enable:
             self.enable = False
             tf = self.tracefunc_stack.pop()
-            frame.f_trace = tf
             while frame:
                 frame.f_trace = tf
                 frame = frame.f_back
@@ -78,16 +77,17 @@ class Watch:
             threading.settrace(tf)
 
     def unwatch(self, *args):
-        frame = inspect.currentframe().f_back
-        if not args:
-            self.watch_list = []
-        else:
-            self.watch_list = [elem for elem in self.watch_list if not elem.belong_to(args)]
+        if self.enable:
+            frame = inspect.currentframe().f_back
+            if not args:
+                self.watch_list = []
+            else:
+                self.watch_list = [elem for elem in self.watch_list if not elem.belong_to(args)]
 
-        if not self.watch_list:
-            self.stop_trace(frame)
+            if not self.watch_list:
+                self.stop_trace(frame)
 
-        del frame
+            del frame
 
     def config(self, **kwargs):
         if "callback" in kwargs:
