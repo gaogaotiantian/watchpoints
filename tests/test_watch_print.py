@@ -55,3 +55,23 @@ class TestWatchPrint(unittest.TestCase):
         os.remove("tmp_test.log")
         self.assertIn("function", data)
         self.assertIn("filename", data)
+
+    def test_use_default_print(self):
+        class MyObject:
+            def __init__(self):
+                self.special_arg = "special_arg"
+
+        elem = Elem()
+        elem.prev_obj = MyObject()
+
+        s = io.StringIO()
+        with redirect_stdout(s):
+            wp = WatchPrint(file=sys.stdout, use_default_print=True)
+            wp(inspect.currentframe(), elem, ("a", "b", "c"))
+            self.assertNotIn("special_arg", s.getvalue())
+
+        s = io.StringIO()
+        with redirect_stdout(s):
+            wp = WatchPrint(file=sys.stdout, use_default_print=False)
+            wp(inspect.currentframe(), elem, ("a", "b", "c"))
+            self.assertIn("special_arg", s.getvalue())

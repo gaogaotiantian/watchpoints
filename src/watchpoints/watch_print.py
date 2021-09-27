@@ -10,9 +10,10 @@ import zipfile
 
 
 class WatchPrint:
-    def __init__(self, file=sys.stderr, stack_limit=None):
+    def __init__(self, file=sys.stderr, stack_limit=None, use_default_print=False):
         self.file = file
         self.stack_limit = stack_limit
+        self.use_default_print = use_default_print
 
     def __call__(self, frame, elem, exec_info):
         p = self.printer
@@ -80,7 +81,10 @@ class WatchPrint:
             if type(obj) is str:
                 print(obj, file=stream)
             else:
-                print(objstr(obj), file=stream)
+                if self.use_default_print:
+                    print(obj, file=stream)
+                else:
+                    print(objstr(obj), file=stream)
 
         if isinstance(self.file, str):
             with open(self.file, "a") as f:

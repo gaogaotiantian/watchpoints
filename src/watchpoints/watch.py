@@ -18,6 +18,7 @@ class Watch:
         self.tracefunc_stack = []
         self.enable = False
         self.stack_limit = 5
+        self.use_default_print = False
         self.set_lock = threading.Lock()
         self.tracefunc_lock = threading.Lock()
         self.restore()
@@ -41,7 +42,8 @@ class Watch:
                         copy=kwargs.get("copy", None),
                         watch_print=WatchPrint(
                             file=kwargs.get("file", self.file),
-                            stack_limit=kwargs.get("stack_limit", self.stack_limit)
+                            stack_limit=kwargs.get("stack_limit", self.stack_limit),
+                            use_default_print=kwargs.get("use_default_print", self.use_default_print)
                         )
                     )
                 )
@@ -102,6 +104,9 @@ class Watch:
 
         if "stack_limit" in kwargs:
             self.stack_limit = kwargs["stack_limit"]
+
+        if "use_default_print" in kwargs:
+            self.use_default_print = kwargs["use_default_print"]
 
     def restore(self):
         self._callback = self._default_callback
