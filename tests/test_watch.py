@@ -216,6 +216,24 @@ class TestWatch(unittest.TestCase):
             unwatch()
             self.assertNotEqual(s.getvalue(), "")
 
+    def test_use_default_print(self):
+        s = io.StringIO()
+        with redirect_stdout(s):
+            watch.config(file=sys.stdout)
+            a = [i for i in range(100)]
+            watch(a, use_default_print=True)
+            a = [i + 1 for i in range(100)]
+            unwatch()
+            self.assertLess(s.getvalue().count("\n"), 100)
+
+        with redirect_stdout(s):
+            watch.config(file=sys.stdout, use_default_print=True)
+            a = [i for i in range(100)]
+            watch(a)
+            a = [i + 1 for i in range(100)]
+            unwatch()
+            self.assertLess(s.getvalue().count("\n"), 100)
+
     def test_stack_limit_global(self):
         watch.config(stack_limit=1)
         s = io.StringIO()
