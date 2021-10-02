@@ -176,6 +176,21 @@ Use config if you want to make it global
 watch.config(file="watch.log")
 ```
 
+### customize printer
+
+You can use your own printer function to print the object, instead of the default ``objprint`` with ``custom_printer``
+
+```python
+# This will use built-in print function for the objects
+watch(a, custom_printer=print)
+```
+
+Use config if you want to make it global
+
+```python
+watch.config(custom_printer=print)
+```
+
 ### alias
 
 You can give an alias to a monitored variable, so you can unwatch it anywhere. And the alias will be printed instead of the variable name
