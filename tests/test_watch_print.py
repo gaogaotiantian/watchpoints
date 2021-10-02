@@ -56,7 +56,7 @@ class TestWatchPrint(unittest.TestCase):
         self.assertIn("function", data)
         self.assertIn("filename", data)
 
-    def test_use_default_print(self):
+    def test_custom_printer(self):
         class MyObject:
             def __init__(self):
                 self.special_arg = "special_arg"
@@ -66,12 +66,12 @@ class TestWatchPrint(unittest.TestCase):
 
         s = io.StringIO()
         with redirect_stdout(s):
-            wp = WatchPrint(file=sys.stdout, use_default_print=True)
+            wp = WatchPrint(file=sys.stdout, custom_printer=print)
             wp(inspect.currentframe(), elem, ("a", "b", "c"))
             self.assertNotIn("special_arg", s.getvalue())
 
         s = io.StringIO()
         with redirect_stdout(s):
-            wp = WatchPrint(file=sys.stdout, use_default_print=False)
+            wp = WatchPrint(file=sys.stdout)
             wp(inspect.currentframe(), elem, ("a", "b", "c"))
             self.assertIn("special_arg", s.getvalue())

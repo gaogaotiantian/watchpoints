@@ -23,6 +23,10 @@ class TestWatch(unittest.TestCase):
         unwatch()
         watch.restore()
 
+    def tearDown(self):
+        watch.restore()
+        return super().tearDown()
+
     def test_basic(self):
         cb = CB()
         watch.config(callback=cb)
@@ -216,18 +220,18 @@ class TestWatch(unittest.TestCase):
             unwatch()
             self.assertNotEqual(s.getvalue(), "")
 
-    def test_use_default_print(self):
+    def test_custom_printer(self):
         s = io.StringIO()
         with redirect_stdout(s):
             watch.config(file=sys.stdout)
             a = [i for i in range(100)]
-            watch(a, use_default_print=True)
+            watch(a, custom_printer=print)
             a = [i + 1 for i in range(100)]
             unwatch()
             self.assertLess(s.getvalue().count("\n"), 100)
 
         with redirect_stdout(s):
-            watch.config(file=sys.stdout, use_default_print=True)
+            watch.config(file=sys.stdout, custom_printer=print)
             a = [i for i in range(100)]
             watch(a)
             a = [i + 1 for i in range(100)]
