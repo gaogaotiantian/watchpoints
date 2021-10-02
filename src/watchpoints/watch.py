@@ -17,8 +17,6 @@ class Watch:
         self.watch_list = []
         self.tracefunc_stack = []
         self.enable = False
-        self.stack_limit = 5
-        self.use_default_print = False
         self.set_lock = threading.Lock()
         self.tracefunc_lock = threading.Lock()
         self.restore()
@@ -43,7 +41,7 @@ class Watch:
                         watch_print=WatchPrint(
                             file=kwargs.get("file", self.file),
                             stack_limit=kwargs.get("stack_limit", self.stack_limit),
-                            use_default_print=kwargs.get("use_default_print", self.use_default_print)
+                            custom_printer=kwargs.get("custom_printer", self.custom_printer)
                         )
                     )
                 )
@@ -105,14 +103,16 @@ class Watch:
         if "stack_limit" in kwargs:
             self.stack_limit = kwargs["stack_limit"]
 
-        if "use_default_print" in kwargs:
-            self.use_default_print = kwargs["use_default_print"]
+        if "custom_printer" in kwargs:
+            self.custom_printer = kwargs["custom_printer"]
 
     def restore(self):
         self._callback = self._default_callback
         self.pdb = None
         self.file = sys.stderr
         self.pdb_enable = False
+        self.stack_limit = 5
+        self.custom_printer = None
 
     def install(self, func="watch"):
         import builtins
