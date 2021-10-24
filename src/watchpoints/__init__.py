@@ -5,7 +5,7 @@
 import atexit
 from .watch import Watch
 
-__version__ = "0.2.4"
+__version__ = "0.2.5"
 
 
 all = [
