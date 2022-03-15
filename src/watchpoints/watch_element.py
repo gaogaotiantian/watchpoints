@@ -6,6 +6,11 @@ from .ast_monkey import ast_parse_node
 from .watch_print import WatchPrint
 import copy
 
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
 
 class WatchElement:
     def __init__(self, frame, node, **kwargs):
@@ -94,6 +99,8 @@ class WatchElement:
     def obj_changed(self, other):
         if not isinstance(self.obj, type(other)):
             return True
+        elif pd is not None and isinstance(self.obj, pd.DataFrame):
+            return not self.obj.equals(other)
         elif self.cmp:
             return self.cmp(self.obj, other)
         elif self.obj.__class__.__module__ == "builtins":
@@ -110,7 +117,9 @@ class WatchElement:
                 return not guess
 
     def update(self):
-        if self.copy:
+        if pd is not None and isinstance(self.obj, pd.DataFrame):
+            self.prev_obj = self.obj.copy(True)
+        elif self.copy:
             self.prev_obj = self.copy(self.obj)
         elif self.deepcopy:
             self.prev_obj = copy.deepcopy(self.obj)
