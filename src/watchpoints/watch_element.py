@@ -9,7 +9,7 @@ import copy
 try:
     import pandas as pd
 except ImportError:
-    pd = None
+    pd = None  # pragma: no cover
 
 
 class WatchElement:
