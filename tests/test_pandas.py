@@ -43,7 +43,7 @@ class TestPandas(unittest.TestCase):
 
         unwatch()
 
-    def test_dataframe(self):
+    def test_dataframe_cmp(self):
         def __comparison_dataframe__(obj1, obj2):
             return not obj1.equals(obj2)
 
@@ -54,6 +54,27 @@ class TestPandas(unittest.TestCase):
         )
 
         watch(df, cmp=__comparison_dataframe__, callback=cb)
+
+        # Other stuff happens
+        a = 2
+        _ = a + 5
+
+        self.assertEqual(cb.counter, 0)
+
+        df.loc["a", "B"] = 10
+
+        self.assertEqual(cb.counter, 1)
+
+        unwatch()
+
+    def test_dataframe(self):
+        cb = CB()
+
+        df = pd.DataFrame(
+            data=[[1, 2], [3, 4], [5, 6]], index=list("abc"), columns=list("AB")
+        )
+
+        watch(df, callback=cb)
 
         # Other stuff happens
         a = 2

@@ -5,6 +5,7 @@
 import unittest
 import inspect
 import os
+import pandas as pd
 from watchpoints.watch_element import WatchElement
 from watchpoints.util import getargnodes
 
@@ -168,6 +169,15 @@ class TestWatchElement(unittest.TestCase):
             wobj.changed(frame)[0]
         obj_eq.a["a"] = 3
         self.assertTrue(wobj_eq.changed(frame)[0])
+
+    def test_dataframe(self):
+        frame = inspect.currentframe()
+        df = pd.DataFrame([1, 2, 3])
+        lst = self.helper(df)
+        wedf = lst[0]
+        self.assertFalse(wedf.changed(frame)[0])
+        df.iloc[0] = 0
+        self.assertTrue(wedf.changed(frame)[0])
 
     def test_global_module(self):
         os.environ['a'] = 'test'
