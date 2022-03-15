@@ -74,7 +74,7 @@ class TestPandas(unittest.TestCase):
             data=[[1, 2], [3, 4], [5, 6]], index=list("abc"), columns=list("AB")
         )
 
-        watch(df)
+        watch(df, callback=cb)
 
         # Other stuff happens
         a = 2
