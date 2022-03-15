@@ -8,8 +8,8 @@ import copy
 
 try:
     import pandas as pd
-except ImportError:
-    pd = None  # pragma: no cover
+except ImportError:  # pragma: no cover
+    pd = None
 
 
 class WatchElement:
